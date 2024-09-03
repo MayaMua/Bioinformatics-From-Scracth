@@ -51,3 +51,36 @@ Use of Timmomatic Tool to Remove Poor Quality Reads
 java -jar trimmomatic-0.39.jar SE -threads 4 fasq_data/test.fastq fasq_data/test_trimmed.fastq TRAILING:10 -phred33
 ```
 
+Use of HISAT2 for Alignment of Reads with Reference Genome (the output sam file from hisat2 will be input to samtools, resulting in bam file.) [Download | HISAT2 (daehwankimlab.github.io)](https://daehwankimlab.github.io/hisat2/download/)
+
+```
+hisat2 -q --rna-strandness R -x grch38/genome -U fasq_data/test_trimmed.fastq | samtools sort -o fasq_data/test_trimmed.bam
+```
+
+`R: The reads are expected to be reversed stranded.`
+
+`F: The reads are expected to be forward stranded.`
+
+`U: The reads are UN stranded.`
+
+`x: Reference genome.`
+
+Output:
+
+```
+1249800 reads; of these: # 1.2 million reads which are unpaired present in a sequencing data.
+  1249800 (100.00%) were unpaired; of these:
+    86563 (6.93%) aligned 0 times # They are not aligned.
+    1082380 (86.60%) aligned exactly 1 time
+    80857 (6.47%) aligned >1 times
+93.07% overall alignment rate
+```
+
+Use [GTF File](https://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38.106.gtf.gz) to Build the Feature Count Matrix
+
+Building of Feature Count Matrix With Subread Tool
+
+```
+featureCounts -S 1 -a Homo_sapiens.GRCh38.106.gtf -o test_featurecounts.txt test_trimmed.bam
+```
+
