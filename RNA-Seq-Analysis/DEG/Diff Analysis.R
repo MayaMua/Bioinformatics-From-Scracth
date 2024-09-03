@@ -7,16 +7,23 @@
                      # BiocManager::install("DESeq2")
                      
 
-cnt <- read.csv("counts.csv")
+cnt <- read.csv("Data/counts.csv")
 str(cnt)
-met <- read.csv("metadata2.csv")
+met <- read.csv("Data/metadata2.csv")
 str(met)
-all(colnames(cnt) %in% rownames(met))
 
-# checking order of row names and column names
+# Make sure that the column names of the count matrix are the same as the row names of the metadata
+all(colnames(cnt) %in% rownames(met))
+# Check order of row names and column names
 all(colnames(cnt) == rownames(met))
 
 library(DESeq2)
+###
+# Two Steps:
+# 1. Create a DESeqDataSet object
+# 2. Perform DEG analysis
+###
+
 dds <- DESeqDataSetFromMatrix(countData = cnt, 
                               colData = met,
                               design = ~dexamethasone)
