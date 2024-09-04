@@ -22,7 +22,7 @@ vsd <- vst(deg, blind = FALSE)
 plotPCA(vsd, intgroup = "dexamethasone")
 ```
 
-![PCA](Outputs\PCA.png)
+![PCA](Outputs/PCA.png)
 
 2. Inspecting Size Factor
 
@@ -45,7 +45,7 @@ plotDispEsts(deg)
 
 ```
 
-![disperssion](Outputs\disperssion.png)
+![disperssion](Outputs/disperssion.png)
 
 The dispersion plot, typically with the final dispersion estimates shrunk from the gene-wise estimates
 
@@ -67,7 +67,7 @@ have a good differential expression of the genes data.
 
 ### Mean-Average (MA) Plot
 
-![MA Plot](Outputs\MA Plot.png)
+![MA Plot](Outputs/MA Plot.png)
 
 The blue dots are actually those genes having a projected value less than 0.05. This means that these are the genes that actually have the differential expression of the genes between the samples.
 
@@ -83,11 +83,11 @@ The smaller the adjusted value the more highly the differentially expressed gene
 
 
 
-![Volcano](D:\Programs\My Github\Bioinformatics-From-Scracth\RNA-Seq-Analysis\DEG\Outputs\Volcano.png)
+![Volcano](Outputs/Volcano.png)
 
 ### Heatmap
 
-![Heatmap](Outputs\Heatmap.png)
+![Heatmap](Outputs/Heatmap.png)
 
 The blue color indicates the low expression of the genes, while the red color indicates the high expression of the genes.
 
@@ -112,13 +112,13 @@ These genes show a low expression in these samples, while the same genes show a 
 
 
 
-![Step1](Outputs\Pathway Step 1.png)
+![Step1](Outputs/Pathway Step 1.png)
 
 
 
 Check the Omnium disease: genes are associated with any particular disease or not.
 
-![List](Outputs\Pathway Step 2.png)
+![List](Outputs/Pathway Step 2.png)
 
 In Gene_Ontology, only BP, CC and MF are selected.
 
@@ -130,4 +130,4 @@ MF stands for the molecular function.
 
 
 
-![Pathway](Outputs\Pathway.png)
+![Pathway](Outputs/Pathway.png)
