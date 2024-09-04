@@ -1,0 +1,6 @@
+
+*.fastq
+*.zip
+*.ht2
+/RNA-Seq-Analysis/DEG/.Rproj.user
+*.bam
