@@ -18,6 +18,7 @@ all(colnames(cnt) %in% rownames(met))
 all(colnames(cnt) == rownames(met))
 
 library(DESeq2)
+
 ###
 # Two Steps:
 # 1. Create a DESeqDataSet object
@@ -36,6 +37,7 @@ dds
 
 # Setting reference for DEG Analysis
 dds$dexamethasone <- relevel(dds$dexamethasone, ref = "untreated")
+
 deg <- DESeq(dds)
 res <- results(deg)
 # write.csv(res, "test_udemy.csv")

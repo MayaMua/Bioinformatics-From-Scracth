@@ -29,7 +29,7 @@ Data: FASTQ Files (Containing Reads)
 
 ## Analyze data using R:
 
-Feature Count Matrix (Counting Reads) 
+Perform differential analysis in R based on Feature Count Matrix (Counting Reads). (See `DEG` folder)
 
 # Workflow under Linux Commands
 
