@@ -112,13 +112,13 @@ These genes show a low expression in these samples, while the same genes show a 
 
 
 
-![Pathway Step 1](Outputs/Pathway Step 1.png)
+![Pathway Step 1](./Outputs/Pathway Step 1.png)
 
 
 
 Check the Omnium disease: genes are associated with any particular disease or not.
 
-![Pathway Step 2](Outputs/Pathway Step 2.png)
+![Pathway Step 2](./Outputs/Pathway Step 2.png)
 
 In Gene_Ontology, only BP, CC and MF are selected.
 
