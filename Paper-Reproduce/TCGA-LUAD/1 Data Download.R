@@ -1,6 +1,6 @@
 
 ##### TCGA-LUAD Data Download #####
-
+# install.packages("tidyverse")
 # install.packages("BiocManager")
 # BiocManager::install("BioinformaticsFMRP/TCGAbiolinksGUI.data")
 # BiocManager::install("remotes")

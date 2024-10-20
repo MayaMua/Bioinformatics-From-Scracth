@@ -1,61 +1,98 @@
-
-####ESTIMATE####
-# Calculate patient immune score and tumor purity
-# Matrix score, Immune score, Tumor score, Tumor purity
-# setwd("ESTIMATE")
-library(utils)
 # rforge <- "http://r-forge.r-project.org"
-install.packages("estimate",
-                 dependencies=TRUE)
+# install.packages("estimate", repos=rforge,
+#                  dependencies=TRUE)
+# install.packages("survminer")
+# install.packages("survival")
+
+library(utils)
 library(estimate)
 library(tidyverse)
 
-exp <- read.table("TCGAdata/tpms01A_log2.txt",sep = "\t",row.names = 1,check.names = F,stringsAsFactors = F,header = T)
+####ESTIMATE####
+# Calculate patient immune score and tumor purity
+# Stromal score, Immune score, Tumor score, Tumor purity
 
-#计算免疫评分
-filterCommonGenes(input.f = "tpms01A_log2.txt",   #输入文件名
-                  output.f = "tpms01A_log2.gct",   #输出文件名
-                  id = "GeneSymbol")   #行名为gene symbol
-estimateScore("tpms01A_log2.gct",   #刚才的输出文件名
-              "tpms01A_log2_estimate_score.txt",   #新的输出文件名（即估计的结果文件）
-              platform="affymetrix")   #默认平台
+exp <- read.table("TCGAdata/tpms01A_log2.txt",
+                  sep = "\t",
+                  row.names = 1,
+                  check.names = F,
+                  stringsAsFactors = F,
+                  header = T)
 
-#提取结果并整理
-ESTIMATE_result <- read.table("tpms01A_log2_estimate_score.txt",sep = "\t",row.names = 1,check.names = F,stringsAsFactors = F,header = T)
-ESTIMATE_result <- ESTIMATE_result[,-1]   
+# Get the common genes
+# Common genes are filtered to ensure that the analysis 
+# only includes genes shared across the dataset, 
+# ensuring accuracy and comparability in the results.
+
+filterCommonGenes(input.f = "TCGAdata/tpms01A_log2.txt",   
+                  output.f = "ESTIMATE/tpms01A_log2.gct", 
+                  id = "GeneSymbol")  
+
+estimateScore("ESTIMATE/tpms01A_log2.gct",   # input
+              "ESTIMATE/tpms01A_log2_estimate_score.txt",  # output
+              platform="affymetrix")
+
+# The ESTIMATE score is used to quantify the stromal and immune content in tumor samples and to infer tumor purity.
+# ImmuneScore indicates immune cell infiltration.
+# StromalScore indicates the presence of stromal cells.
+# ESTIMATEScore provides an overall estimate of tumor purity.
+# Tumor purity and the tumor microenvironment (immune and stromal content) a
+# re essential for understanding cancer behavior, 
+# predicting prognosis, and tailoring treatments such as immunotherapy.
+
+ESTIMATE_result <- read.table("ESTIMATE/tpms01A_log2_estimate_score.txt", sep = "\t", 
+                              row.names = 1, check.names = F,
+                              stringsAsFactors = F, header = T)
+
+# Remove the first column
+ESTIMATE_result <- ESTIMATE_result[,-1]  
+# Set the column names
 colnames(ESTIMATE_result) <- ESTIMATE_result[1,]   
+# Transpose the matrix
 ESTIMATE_result <- as.data.frame(t(ESTIMATE_result[-1,]))
+# Set the row names (. -> -)
 rownames(ESTIMATE_result) <- colnames(exp)
-#保存结果
-write.table(ESTIMATE_result, file = "ESTIMATE_result.txt",sep = "\t",row.names = T,col.names = NA,quote = F) 
+# Save the result
+write.table(ESTIMATE_result, file = "ESTIMATE/ESTIMATE_result.txt",
+            sep = "\t", row.names = T,
+            col.names = NA, quote = F) 
 
-####生存信息整理####
+
+#### Survival data process ####
 # Which group has longer survival time?
-#xena官网：https://xenabrowser.net/datapages/
-#下载生存信息
-setwd("TCGA-LUAD")
-setwd("Survival_data")
-library(tidyverse)
+# https://xenabrowser.net/datapages/
+# Download survival data
 
-survival <- read.delim("OS.txt", row.names = 1)
-
+# In terminal:
+# mkdir Survival_data && cd Survival_data
+# wget -c https://tcga-xena-hub.s3.us-east-1.amazonaws.com/download/survival%2FLUAD_survival.txt
+# mv *survival*.txt LUAD_survival.txt
+survival <- read.delim("Survival_data/LUAD_survival.txt", row.names = 1)
+# Only need OS and OS.time
+# 0: dead 1: alive
 survival <- survival[, 2:3]
+# Add a new column 'sample'
 survival <- survival %>% rownames_to_column('sample')
-survival$name <- paste0(survival$sample, 'A')#paste 0: seamless
+# Add 'a' to the end of the sample name and save the result in a new column 'name'
+survival$name <- paste0(survival$sample, 'A') # paste0: seamless
 table(substring(survival$name, 14, 16))
 rownames(survival) <- survival$name
 survival <- survival[, 2:3]
-#合并生存信息与表达谱
-tpms01A_log2 <- read.table("tpms01A_log2.txt", sep = "\t",row.names = 1,check.names = F,header = T) # 肿瘤患者基因表达谱
-a <- intersect(colnames(tpms01A_log2),rownames(survival))
-table(substr(a,14,16))
-exp_01A <- tpms01A_log2[,a]
-surv_01A <- survival[a,]
+
+
+# Combine survival information with gene expression profile
+tpms01A_log2 <- read.table("TCGAdata/tpms01A_log2.txt", sep = "\t",
+                           row.names = 1, check.names = F, header = T) # Tumor patient gene expression profile
+# Get the common samples
+intersec_samples <- intersect(colnames(tpms01A_log2), rownames(survival))
+table(substr(intersec_samples, 14, 16))
+exp_01A <- tpms01A_log2[, intersec_samples]
+surv_01A <- survival[intersec_samples,]
 exp_01A <- exp_01A %>% t() %>% as.data.frame()
 identical(rownames(exp_01A),rownames(surv_01A))
 exp_surv_01A <- cbind(surv_01A,exp_01A)
-##保存文件##
-write.table(exp_surv_01A,"exp_surv_01A.txt",sep = "\t",row.names = T,col.names = NA,quote = F)
+
+write.table(exp_surv_01A,"Survival_data/exp_surv_01A.txt",sep = "\t",row.names = T,col.names = NA,quote = F)
 
 #合并生存信息与ESTIMATE
 ESTIMATE_result <- read.table("ESTIMATE_result.txt", sep = "\t",row.names = 1,check.names = F,header = T)
@@ -155,7 +192,6 @@ surv$group <- ifelse(surv$ESTIMATEScore > median(surv$ESTIMATEScore),"High","Low
 surv$group <- factor(surv$group, levels = c("Low","High")) 
 class(surv$group)
 table(surv$group)
-#install.packages("survival")
 library(survival)
 fitd <- survdiff(Surv(OS.time, OS) ~ group,
                  data      = surv,
@@ -166,7 +202,6 @@ pValue <- 1 - pchisq(fitd$chisq, length(fitd$n) - 1)
 fit <- survfit(Surv(OS.time, OS)~ group, data = surv)
 summary(fit)
 p.lab <- paste0("P", ifelse(pValue < 0.001, " < 0.001", paste0(" = ",round(pValue, 3))))
-#install.packages("survminer")
 library(survminer)
 ggsurvplot(fit,
            data = surv,
