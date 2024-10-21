@@ -1,8 +1,8 @@
 # rforge <- "http://r-forge.r-project.org"
 # install.packages("estimate", repos=rforge,
 #                  dependencies=TRUE)
-# install.packages("survminer")
-# install.packages("survival")
+install.packages("survminer")
+install.packages("survival")
 
 library(utils)
 library(estimate)
