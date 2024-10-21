@@ -1,11 +1,12 @@
 
 ##### TCGA-LUAD Data Download #####
 # install.packages("tidyverse")
-# install.packages("BiocManager")
-# BiocManager::install("BioinformaticsFMRP/TCGAbiolinksGUI.data")
-# BiocManager::install("remotes")
-# BiocManager::install("ExperimentHub")
-# BiocManager::install("BioinformaticsFMRP/TCGAbiolinks")
+install.packages("BiocManager")
+BiocManager::install("remotes")
+BiocManager::install("ExperimentHub")
+BiocManager::install(c("SparseArray", "DelayedArray", "SummarizedExperiment"), force = TRUE)
+BiocManager::install("BioinformaticsFMRP/TCGAbiolinks")
+BiocManager::install("BioinformaticsFMRP/TCGAbiolinksGUI.data")
 
 
 setwd("TCGAdata")

@@ -52,7 +52,8 @@ ncol(counts_annot_protein_coding) # # of columns (602)
 nrow(counts_annot_protein_coding) # # of rows (19934)
 
 # Only keep 16 characters of TCGA barcode and remove duplicate obs.
-# e.g. TCGA-73-4658-01A-01R-1755-07 -> TCGA-73-4658-01A
+# e.g. TCGA-73-4658-01A-01R-1755-07 -> TCGA-73-4658-01A 
+# (use colnames(counts_annot_protein_coding)[1] to get the column name)
 # Overwrite the column names
 colnames(counts_annot_protein_coding) <- substring(
                 colnames(counts_annot_protein_coding), 1, 16)
