@@ -1,6 +1,11 @@
+library(BiocManager)
+# # BiocManager::install('DESeq2')
 library(DESeq2)
 library(tidyverse)
+# # install.packages("pheatmap")
 library(pheatmap)
+# install.packages("VennDiagram")
+library(VennDiagram)
 
 # Function to perform differential analysis and prepare data for heatmap plotting
 run_differential_expression <- function(counts_file, estimate_file, score_type, logFC_cutoff = 1, save_file) {
@@ -63,6 +68,14 @@ run_differential_expression <- function(counts_file, estimate_file, score_type, 
   print(paste("Number of downregulated genes:", nrow(gene_down)))
   print("=============================================")
   
+  # Save the up and downregulated gene lists to CSV files
+  file_up <- paste("Immune_Stromal_DEG/", score_type, "_up.csv", sep = "")
+  write.csv(gene_up, file = file_up)
+  file_down <- paste("Immune_Stromal_DEG/", score_type, "_down.csv", sep = "")
+  write.csv(gene_down, file = file_down)
+  
+  print(paste("Saved downregulated and upregulated gene lists to", file_up, "and", file_down, "."))
+  
   # Step 8: Load TPM expression data
   exp <- read.table("TCGAdata/tpms01A_log2.txt", sep = "\t", row.names = 1, 
                     check.names = F, stringsAsFactors = F, header = T)
@@ -87,8 +100,11 @@ immune_results <- run_differential_expression(
   counts_file = "TCGAdata/counts01A.txt", 
   estimate_file = "ESTIMATE/ESTIMATE_result.txt", 
   score_type = "ImmuneScore", 
-  save_file = "DEG Plots/DEG_ImmuneScore.rda"
+  save_file = "Immune_Stromal_DEG/DEG_ImmuneScore.rda"
 )
+# [1] "Number of upregulated genes: 733"
+# [1] "Number of downregulated genes: 556"
+
 
 # Plot the heatmap for ImmuneScore
 pheatmap(immune_results$exp_diff,
@@ -111,8 +127,11 @@ stromal_results <- run_differential_expression(
   counts_file = "TCGAdata/counts01A.txt", 
   estimate_file = "ESTIMATE/ESTIMATE_result.txt", 
   score_type = "StromalScore", 
-  save_file = "DEG Plots/DEG_StromalScore.rda"
+  save_file = "Immune_Stromal_DEG/DEG_StromalScore.rda"
 )
+
+# [1] "Number of upregulated genes: 599"
+# [1] "Number of downregulated genes: 491"
 
 # Plot the heatmap for StromalScore
 pheatmap(stromal_results$exp_diff,
@@ -129,15 +148,73 @@ pheatmap(stromal_results$exp_diff,
          main = "Differential Expression Heatmap: StromalScore"
          )
 
+#### Venn diagram ####
+
+# Load the upregulated gene lists
+immune_up <- read.csv("Immune_Stromal_DEG/ImmuneScore_up.csv", row.names = 1)
+stromal_up <- read.csv("Immune_Stromal_DEG/StromalScore_up.csv", row.names = 1)
+
+# Extract the gene symbols
+immune_up_genes <- rownames(immune_up)
+stromal_up_genes <- rownames(stromal_up)
+
+# Plot the Venn diagram for "up" genes
+venn_up <- venn.diagram(
+  x = list(Stromal = stromal_up_genes, Immune = immune_up_genes),
+  category.names = c("Stromal", "Immune"),
+  filename = "Immune_Stromal_DEG/venn_up.png", # Save the plot as a PNG file
+  output = TRUE,
+  fill = c("lightblue", "peachpuff"),
+  alpha = 0.5,
+  cex = 2,
+  cat.cex = 1.5,
+  cat.pos = c(180, 180),
+  main = "Venn Diagram of Upregulated Genes" 
+)
+# Draw the Venn diagrams
+grid.newpage()
+grid.draw(venn_up)
+
+# Load the downregulated gene lists
+immune_down <- read.csv("Immune_Stromal_DEG/ImmuneScore_down.csv", row.names = 1)
+stromal_down <- read.csv("Immune_Stromal_DEG/StromalScore_down.csv", row.names = 1)
+
+# Extract the gene symbols
+immune_down_genes <- rownames(immune_down)
+stromal_down_genes <- rownames(stromal_down)
+
+# Plot the Venn diagram for "down" genes
+venn_down <- venn.diagram(
+  x = list(Stromal = stromal_down_genes, Immune = immune_down_genes),
+  category.names = c("Stromal", "Immune"),
+  filename = "Immune_Stromal_DEG/venn_down.png",
+  output = TRUE,
+  fill = c("lightblue", "peachpuff"),
+  alpha = 0.5,
+  cex = 2,
+  cat.cex = 1.5,
+  cat.pos = c(180, 180),
+  main = "Venn Diagram of Downregulated Genes"
+)
+grid.newpage()
+grid.draw(venn_down)
+
+# Extract the intersection of upregulated genes
+up_intersection <- Reduce(intersect, list(immune_up_genes, stromal_up_genes))
+
+# Extract the intersection of downregulated genes
+down_intersection <- Reduce(intersect, list(immune_down_genes, stromal_down_genes))
+
+# Combine the upregulated and downregulated intersections
+DEG_final <- c(up_intersection, down_intersection)
+
+# Convert the final list of DEGs to a data frame
+DEG_final <- data.frame(SYMBOL = DEG_final)
+
+# Save the final list of differentially expressed genes
+write.csv(DEG_final, file = "Immune_Stromal_DEG/DEG_final.csv", row.names = FALSE)
 
 
-# library(BiocManager)
-# # BiocManager::install('DESeq2')
-# library(DESeq2)
-# library(tidyverse)
-# # install.packages("pheatmap")
-# library(pheatmap)
-# 
 # #### Differential Expression ####
 # #### Get Immune Score ####
 # 
@@ -186,7 +263,7 @@ pheatmap(stromal_results$exp_diff,
 # # Step 3: Extract results
 # resultsNames(dds)
 # res <- results(dds)
-# save(res, file = "DEG Plots/DEG_ImmuneScore.rda")
+# save(res, file = "Immune_Stromal_DEG/DEG_ImmuneScore.rda")
 # 
 # #### Plot Heatmap ####
 # # log2FoldChange: The log2 fold change of the gene expression between the two groups.
