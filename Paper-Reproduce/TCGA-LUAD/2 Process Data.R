@@ -120,7 +120,8 @@ write.table(tpms,"tpms.txt",sep = "\t",
             row.names = T, col.names = NA, quote = F)
 
 
-
+read.table("counts.txt", header = T, row.names = 1) -> counts
+read.table("tpms.txt", header = T, row.names = 1) -> tpms
 # Check the range of the data
 range(tpms)
 # log2 transform. Why need + 1? 

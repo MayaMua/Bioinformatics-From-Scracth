@@ -1,8 +1,8 @@
 # rforge <- "http://r-forge.r-project.org"
 # install.packages("estimate", repos=rforge,
 #                  dependencies=TRUE)
-install.packages("survminer")
-install.packages("survival")
+# install.packages("survminer")
+# install.packages("survival")
 
 library(utils)
 library(estimate)
@@ -101,7 +101,6 @@ ESTIMATE_result <- read.table("ESTIMATE/ESTIMATE_result.txt", sep = "\t",row.nam
 identical(rownames(ESTIMATE_result),rownames(surv_01A))
 ESTIMATE_result_surv_01A <- cbind(surv_01A, ESTIMATE_result)
 
-##保存文件##
 write.table(ESTIMATE_result_surv_01A, "Survival_data/ESTIMATE_result_surv_01A.txt",sep = "\t",row.names = T,col.names = NA,quote = F)
 
 
